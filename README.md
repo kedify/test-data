@@ -11,9 +11,9 @@ kubectl apply -f https://raw.githubusercontent.com/zroubalik/test-data/main/reso
 ```
 
 ### Bulk creation:
-Following command creates 10 namespaces, in each namespace 25 SOs and 25 SJs
+Following command creates 5 namespaces (named test-1 - test-5), in each namespace 25 SOs and 20 SJs
 ```bash
 curl -s https://raw.githubusercontent.com/zroubalik/test-data/main/resources/create_resources.sh | \
-bash -s -- 10 25 25 test
+bash -s -- 5 25 20 test
 ```
 >Usage: ./create_resources.sh <num_namespaces> <scaled_objects_per_ns> <scaled_jobs_per_ns> [namespace_prefix]
