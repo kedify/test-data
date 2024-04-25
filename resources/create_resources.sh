@@ -1,19 +1,24 @@
 #!/bin/bash
 
-# Usage: ./create_resources.sh <num_namespaces> <scaled_objects_per_ns> <scaled_jobs_per_ns>
+# Usage: ./create_resources.sh <num_namespaces> <scaled_objects_per_ns> <scaled_jobs_per_ns> [namespace_prefix]
 
-if [[ $# -ne 3 ]]; then
-    echo "Usage: $0 <num_namespaces> <scaled_objects_per_ns> <scaled_jobs_per_ns>"
+if [[ $# -lt 3 ]] || [[ $# -gt 4 ]]; then
+    echo "Usage: $0 <num_namespaces> <scaled_objects_per_ns> <scaled_jobs_per_ns> [namespace_prefix]"
     exit 1
 fi
 
 num_namespaces=$1
 scaled_objects_per_ns=$2
 scaled_jobs_per_ns=$3
+namespace_prefix=$4  # This is an optional parameter, it could be empty.
+
+if [ -z "$namespace_prefix" ]; then
+    namespace_prefix="namespace"
+fi
 
 for (( n=1; n<=num_namespaces; n++ ))
 do
-    namespace="namespace-$n"
+    namespace="${namespace_prefix}-${n}"
     kubectl create namespace $namespace >/dev/null 2>&1 &
 
     # Create Metrics Source Deployment and Service in parallel
