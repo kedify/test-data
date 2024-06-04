@@ -1,7 +1,7 @@
 apiVersion: keda.sh/v1alpha1
 kind: ScaledObject
 metadata:
-  name: kedify-sample-so    
+  name: kedify-sample-cron-so    
 spec:
   scaleTargetRef:           
     name: kedify-sample-cron              
