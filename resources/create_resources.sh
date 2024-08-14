@@ -2,6 +2,9 @@
 
 # Usage: ./create_resources.sh <num_namespaces> <scaled_objects_per_ns> <scaled_jobs_per_ns> [namespace_prefix]
 
+OTHER_DEPLOYMENTS=${OTHER_DEPLOYMENTS:-"0"}
+OTHER_STATEFUL_SETS=${OTHER_STATEFUL_SETS:-"0"}
+
 if [[ $# -lt 3 ]] || [[ $# -gt 4 ]]; then
     echo "Usage: $0 <num_namespaces> <scaled_objects_per_ns> <scaled_jobs_per_ns> [namespace_prefix]"
     exit 1
@@ -16,8 +19,7 @@ if [ -z "$namespace_prefix" ]; then
     namespace_prefix="namespace"
 fi
 
-for (( n=1; n<=num_namespaces; n++ ))
-do
+for (( n=1; n<=num_namespaces; n++ )); do
     namespace="${namespace_prefix}-${n}"
     kubectl create namespace $namespace >/dev/null 2>&1 &
 
@@ -64,8 +66,7 @@ EOF
         echo "Metrics source deployed in $namespace."
     ) &
 
-    for (( x=1; x<=scaled_objects_per_ns; x++ ))
-    do
+    for (( x=1; x<=scaled_objects_per_ns; x++ )); do
         # Create Deployment and ScaledObject for each instance in parallel
         (
             kubectl apply -n $namespace -f - <<EOF >/dev/null 2>&1
@@ -119,8 +120,7 @@ EOF
         ) &
     done
 
-    for (( y=1; y<=scaled_jobs_per_ns; y++ ))
-    do
+    for (( y=1; y<=scaled_jobs_per_ns; y++ )); do
         # Create each ScaledJob in parallel
         (
             kubectl apply -n $namespace -f - <<EOF >/dev/null 2>&1
@@ -150,6 +150,58 @@ spec:
       url: "http://kedify-sample-minute-metrics.$namespace.svc.cluster.local/api/v1/minutemetrics"
       valueLocation: "value"
       targetValue: '$((12 + y * 2))'
+EOF
+        ) &
+    done
+
+    echo Deploying ${OTHER_DEPLOYMENTS} other deployments
+    for (( x=1; x<=${OTHER_DEPLOYMENTS}; x++ )); do
+        # Create other Deployments simulating normal user workloads
+        (
+            kubectl apply -n $namespace -f - <<EOF >/dev/null 2>&1
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: some-other-app-$x
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: some-other-app-$x
+  template:
+    metadata:
+      labels:
+        app: some-other-app-$x
+    spec:
+      containers:
+      - name: pause
+        image: registry.k8s.io/pause:latest
+EOF
+        ) &
+    done
+
+    echo Deploying ${OTHER_STATEFUL_SETS} other stateful sets
+    for (( x=1; x<=${OTHER_STATEFUL_SETS}; x++ )); do
+        # Create other Deployments simulating normal user workloads
+        (
+            kubectl apply -n $namespace -f - <<EOF >/dev/null 2>&1
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: some-other-stateful-app-$x
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: some-other-stateful-app-$x
+  template:
+    metadata:
+      labels:
+        app: some-other-stateful-app-$x
+    spec:
+      containers:
+      - name: pause
+        image: registry.k8s.io/pause:latest
 EOF
         ) &
     done
