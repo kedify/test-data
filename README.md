@@ -27,7 +27,7 @@ bash -s -- 5 25 20 test
 ## Simulating a k8s cluster that has also some other workloads:
 ```
 # create a cluster w/ 5 worker nodes
-k3d cluster delete ; k3d cluster create --servers 5 --port "9080:80@loadbalancer"
+k3d cluster delete ; k3d cluster create --servers 7 --no-lb --k3s-arg "--disable=traefik,servicelb,local-storage@server:*"
 kubectl wait --for=condition=Ready nodes --all --timeout=600s
 
 # install kedify
