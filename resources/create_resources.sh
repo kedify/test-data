@@ -145,8 +145,8 @@ spec:
           - /bin/sh
           - -c
           - sleep 30
+          imagePullPolicy: IfNotPresent
         restartPolicy: Never
-        imagePullPolicy: IfNotPresent
   pollingInterval: $((30 + y))
   successfulJobsHistoryLimit: 3
   failedJobsHistoryLimit: 5

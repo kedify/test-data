@@ -26,20 +26,22 @@ bash -s -- 5 25 20 test
 
 ## Simulating a k8s cluster that has also some other workloads:
 ```
-# create a cluster w/ 5 worker nodes
+# create a cluster w/ 7 worker nodes
 k3d cluster delete ; k3d cluster create --servers 7 --no-lb --k3s-arg "--disable=traefik,servicelb,local-storage@server:*"
 kubectl wait --for=condition=Ready nodes --all --timeout=600s
 
 # install kedify
 kubectl kedify i --email foo@bar -y
 
+# 30 pods in total
 curl -s https://raw.githubusercontent.com/kedify/test-data/main/resources/create_resources.sh | \
 OTHER_DEPLOYMENTS=1 \
-bash -s -- 5 15 20 scale
+bash -s -- 2 10 4 scale
 
-# create 8 namespaces (t-1 - t-8) and in each 7 deployments and 1 stateful set (with pause container)
+# create 10 namespaces (t-1 - t-10) and in each 6 deployments and 1 stateful set (with pause container)
+# 70 pods in total
 curl -s https://raw.githubusercontent.com/kedify/test-data/main/resources/create_resources.sh | \
-OTHER_DEPLOYMENTS=7 \
+OTHER_DEPLOYMENTS=6 \
 OTHER_STATEFUL_SETS=1 \
-bash -s -- 8 0 0 t
+bash -s -- 10 0 0 t
 ```
