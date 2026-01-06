@@ -1,5 +1,9 @@
-# Testing resources for Kedify & KEDA
+> **⚠️ Repository Archived**  
+> This repository has been archived and its content has been migrated to [https://github.com/kedify/examples/tree/main/test-data](https://github.com/kedify/examples/tree/main/test-data).
+>
+> Please use the new location for the latest updates and resources.
 
+# Testing resources for Kedify & KEDA
 
 ## Basic: Sample SO and SJ
 ```bash
